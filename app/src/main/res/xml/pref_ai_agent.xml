@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <PreferenceCategory android:title="AI Agent Configuration">
+        
+        <ListPreference
+            android:key="ai_provider"
+            android:title="AI Provider"
+            android:summary="Select your AI service provider"
+            android:entries="@array/ai_providers"
+            android:entryValues="@array/ai_provider_values"
+            android:defaultValue="openrouter" />
+        
+        <EditTextPreference
+            android:key="ai_api_key"
+            android:title="API Key"
+            android:summary="Your API key from the provider"
+            android:inputType="textPassword"
+            android:dialogTitle="Enter API Key" />
+        
+        <EditTextPreference
+            android:key="ai_api_endpoint"
+            android:title="API Endpoint"
+            android:summary="https://openrouter.ai/api/v1/chat/completions"
+            android:dialogTitle="Enter API Endpoint URL" />
+        
+        <EditTextPreference
+            android:key="ai_model_name"
+            android:title="Model Name"
+            android:summary="e.g., gpt-4, gemini-pro"
+            android:dialogTitle="Enter Model Name" />
+        
+        <Preference
+            android:key="ai_save_config"
+            android:title="Save Configuration"
+            android:summary="Click to save AI agent settings" />
+        
+    </PreferenceCategory>
+    
+</PreferenceScreen>

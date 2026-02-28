@@ -7,6 +7,10 @@
         android:title="@string/project_path_menu_title" />
 
     <item
+        android:id="@+id/menu_ai_agent"
+        android:title="AI Code Generator" />
+
+    <item
         android:id="@+id/menu_settings"
         android:title="@string/menu_settings" />
 

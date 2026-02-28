@@ -19,6 +19,12 @@
         app:title="@string/settings_build_run_title" />
 
     <Preference
+        app:fragment="com.tyron.code.ui.settings.AIAgentSettingsFragment"
+        app:iconSpaceReserved="false"
+        app:summary="Configure AI API for code generation"
+        app:title="AI Agent" />
+
+    <Preference
         app:fragment="com.tyron.code.ui.settings.AboutUsFragment"
         app:iconSpaceReserved="false"
         app:title="@string/settings_about_us_title"

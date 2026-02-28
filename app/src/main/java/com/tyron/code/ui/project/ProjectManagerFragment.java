@@ -123,6 +123,13 @@ public class ProjectManagerFragment extends Fragment {
                 return true;
             }
 
+            if (id == R.id.menu_ai_agent) {
+                Intent intent = new Intent();
+                intent.setClass(requireActivity(), com.tyron.code.ui.editor.AIAgentActivity.class);
+                startActivity(intent);
+                return true;
+            }
+
             if (id == R.id.menu_settings) {
                 Intent intent = new Intent();
                 intent.setClass(requireActivity(), SettingsActivity.class);

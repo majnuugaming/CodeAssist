@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="AI Code Generator"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="?attr/colorPrimary"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/prompt_input"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:hint="Describe the code you want to generate..."
+        android:inputType="textMultiLine"
+        android:gravity="top|start"
+        android:background="@drawable/rounded_rectangle"
+        android:padding="12dp"
+        android:layout_marginBottom="12dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginBottom="16dp">
+
+        <Button
+            android:id="@+id/send_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Generate Code"
+            android:backgroundTint="?attr/colorPrimary" />
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Generated Code:"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/result_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+</LinearLayout>

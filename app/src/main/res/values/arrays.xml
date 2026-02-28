@@ -9,4 +9,15 @@
         <item>reply</item>
         <item>reply_all</item>
     </string-array>
+    
+    <!-- AI Agent Provider -->
+    <string-array name="ai_providers">
+        <item>OpenRouter</item>
+        <item>Google Gemini</item>
+    </string-array>
+
+    <string-array name="ai_provider_values">
+        <item>openrouter</item>
+        <item>gemini</item>
+    </string-array>
 </resources>
