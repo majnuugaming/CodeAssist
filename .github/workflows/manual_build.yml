@@ -1,4 +1,3 @@
-name: Manual APK Build
 
 on:
   push:
