@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="AI Code Generator"
+        android:text="AI Agent"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="?attr/colorPrimary"
@@ -18,7 +18,7 @@
         android:id="@+id/prompt_input"
         android:layout_width="match_parent"
         android:layout_height="120dp"
-        android:hint="Describe the code you want to generate..."
+        android:hint="Describe a code task or file operation (create, edit, delete, copy)"
         android:inputType="textMultiLine"
         android:gravity="top|start"
         android:background="@drawable/rounded_rectangle"
@@ -36,7 +36,7 @@
             android:id="@+id/send_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Generate Code"
+            android:text="Send"
             android:backgroundTint="?attr/colorPrimary" />
 
     </LinearLayout>
@@ -50,7 +50,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Generated Code:"
+        android:text="Results:"
         android:textSize="14sp"
         android:textStyle="bold"
         android:layout_marginTop="8dp"

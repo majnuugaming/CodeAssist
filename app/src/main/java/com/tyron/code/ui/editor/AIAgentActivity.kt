@@ -54,23 +54,31 @@ class AIAgentActivity : AppCompatActivity() {
     }
     
     private fun generateCode(prompt: String) {
+        // rename to more generic since it might be a local command
         progressBar.visibility = android.view.View.VISIBLE
         sendButton.isEnabled = false
-        
+
         lifecycleScope.launch {
             try {
-                val result = aiService.generateCode(prompt)
-                result.onSuccess { code ->
+                val result = aiService.processPrompt(prompt)
+                result.onSuccess { response ->
                     val aiResult = AIResult(
                         prompt = prompt,
-                        code = code,
+                        code = response,
                         timestamp = System.currentTimeMillis()
                     )
                     results.add(0, aiResult)
                     resultAdapter.notifyItemInserted(0)
                     resultRecyclerView.scrollToPosition(0)
                     promptEditText.text.clear()
-                    Toast.makeText(this@AIAgentActivity, "Code generated successfully", Toast.LENGTH_SHORT).show()
+                    // show appropriate toast depending on whether it was a command or code
+                    if (response.startsWith("Created file") || response.startsWith("Deleted") ||
+                        response.startsWith("Copied") || response.startsWith("Moved") ||
+                        response.startsWith("Edited")) {
+                        Toast.makeText(this@AIAgentActivity, response, Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this@AIAgentActivity, "Operation completed", Toast.LENGTH_SHORT).show()
+                    }
                 }
                 result.onFailure { error ->
                     Toast.makeText(this@AIAgentActivity, "Error: ${error.message}", Toast.LENGTH_LONG).show()

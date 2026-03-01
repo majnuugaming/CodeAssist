@@ -75,6 +75,7 @@ class AIAgentService(private val context: Context) {
     }
     
     suspend fun generateCode(prompt: String): Result<String> = withContext(Dispatchers.IO) {
+        // existing implementation unchanged
         try {
             val config = getAPIConfig()
             
@@ -130,6 +131,124 @@ class AIAgentService(private val context: Context) {
             
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    /**
+     * Analyze a prompt and decide whether to execute a local file operation or delegate to remote
+     * AI code generation. Recognizes simple natural-language commands driving file system changes
+     * (create, delete, copy, move, edit) under the app's storage area. Returns a human-readable
+     * result message that may also contain generated code when delegating.
+     */
+    suspend fun processPrompt(prompt: String): Result<String> = withContext(Dispatchers.IO) {
+        // simple parsing patterns, case insensitive but preserve original prompt when writing content
+        val trimmed = prompt.trim()
+        val lowered = trimmed.lowercase()
+
+        fun successMessage(msg: String) = Result.success(msg)
+        fun failureMessage(msg: String) = Result.failure(Exception(msg))
+
+        try {
+            when {
+                lowered.startsWith("create file") -> {
+                    // syntax: create file PATH [with CONTENT]
+                    val regex = Regex("create file\\s+(.+?)(?:\\s+with\\s+([\"][\\s\\S]+[\"]|.+))?",
+                        RegexOption.IGNORE_CASE)
+                    val match = regex.find(trimmed)
+                    if (match != null) {
+                        val path = match.groupValues[1].trim().trim('"')
+                        val content = match.groupValues.getOrNull(2)?.trim()?.trim('"') ?: ""
+                        val file = File(context.filesDir, path)
+                        file.parentFile?.mkdirs()
+                        if (content.isNotEmpty()) {
+                            file.writeText(content)
+                        } else {
+                            file.createNewFile()
+                        }
+                        return@withContext successMessage("Created file: ${file.absolutePath}")
+                    }
+                    return@withContext failureMessage("Could not parse create file command")
+                }
+                lowered.startsWith("delete file") -> {
+                    // syntax: delete file PATH
+                    val regex = Regex("delete file\\s+(.+)", RegexOption.IGNORE_CASE)
+                    val match = regex.find(trimmed)
+                    if (match != null) {
+                        val path = match.groupValues[1].trim().trim('"')
+                        val file = File(context.filesDir, path)
+                        if (file.exists()) {
+                            if (file.deleteRecursively()) {
+                                return@withContext successMessage("Deleted file: ${file.absolutePath}")
+                            } else {
+                                return@withContext failureMessage("Failed to delete: ${file.absolutePath}")
+                            }
+                        } else {
+                            return@withContext failureMessage("File does not exist: ${file.absolutePath}")
+                        }
+                    }
+                    return@withContext failureMessage("Could not parse delete file command")
+                }
+                lowered.startsWith("copy file") || lowered.startsWith("paste file") -> {
+                    // syntax: copy file SOURCE to DEST
+                    val regex = Regex("(?:copy|paste) file\\s+(.+)\\s+to\\s+(.+)", RegexOption.IGNORE_CASE)
+                    val match = regex.find(trimmed)
+                    if (match != null) {
+                        val srcPath = match.groupValues[1].trim().trim('"')
+                        val destPath = match.groupValues[2].trim().trim('"')
+                        val srcFile = File(context.filesDir, srcPath)
+                        val destFile = File(context.filesDir, destPath)
+                        if (!srcFile.exists()) {
+                            return@withContext failureMessage("Source does not exist: ${srcFile.absolutePath}")
+                        }
+                        destFile.parentFile?.mkdirs()
+                        srcFile.copyTo(destFile, overwrite = true)
+                        return@withContext successMessage("Copied file to ${destFile.absolutePath}")
+                    }
+                    return@withContext failureMessage("Could not parse copy/paste command")
+                }
+                lowered.startsWith("move file") || lowered.startsWith("rename file") -> {
+                    val regex = Regex("(?:move|rename) file\\s+(.+)\\s+to\\s+(.+)", RegexOption.IGNORE_CASE)
+                    val match = regex.find(trimmed)
+                    if (match != null) {
+                        val srcPath = match.groupValues[1].trim().trim('"')
+                        val destPath = match.groupValues[2].trim().trim('"')
+                        val srcFile = File(context.filesDir, srcPath)
+                        val destFile = File(context.filesDir, destPath)
+                        if (!srcFile.exists()) {
+                            return@withContext failureMessage("Source does not exist: ${srcFile.absolutePath}")
+                        }
+                        destFile.parentFile?.mkdirs()
+                        if (srcFile.renameTo(destFile)) {
+                            return@withContext successMessage("Moved file to ${destFile.absolutePath}")
+                        } else {
+                            return@withContext failureMessage("Failed to move file")
+                        }
+                    }
+                    return@withContext failureMessage("Could not parse move command")
+                }
+                lowered.startsWith("edit file") -> {
+                    // syntax: edit file PATH with CONTENT
+                    val regex = Regex("edit file\\s+(.+?)\\s+with\\s+([\\s\\S]+)", RegexOption.IGNORE_CASE)
+                    val match = regex.find(trimmed)
+                    if (match != null) {
+                        val path = match.groupValues[1].trim().trim('"')
+                        val content = match.groupValues[2].trim().trim('"')
+                        val file = File(context.filesDir, path)
+                        if (!file.exists()) {
+                            return@withContext failureMessage("File does not exist: ${file.absolutePath}")
+                        }
+                        file.writeText(content)
+                        return@withContext successMessage("Edited file: ${file.absolutePath}")
+                    }
+                    return@withContext failureMessage("Could not parse edit file command")
+                }
+                else -> {
+                    // default behaviour: forward to remote AI for code generation
+                    return@withContext generateCode(prompt)
+                }
+            }
+        } catch (e: Exception) {
+            return@withContext Result.failure(e)
         }
     }
     
